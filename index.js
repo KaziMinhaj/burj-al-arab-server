@@ -8,17 +8,16 @@ const admin = require("firebase-admin");
 app.use(cors()); //cross origin resouce access permission
 app.use(bodyParser.json());
 
+require('dotenv').config()
 // var admin = require("firebase-admin");
 
-var serviceAccount = require("./burj-al-arab-67d57-firebase-adminsdk-hgy8f-ccda804998.json");
+var serviceAccount = require("./Configs/burj-al-arab-67d57-firebase-adminsdk-hgy8f-ccda804998.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+admin.initializeApp({credential: admin.credential.cert(serviceAccount)});
 
 const MongoClient = require("mongodb").MongoClient;
 const uri =
-  "mongodb+srv://arabian:7GtbZZktygOziliw@cluster0.fzhcz.mongodb.net/burjAlArab?retryWrites=true&w=majority";
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fzhcz.mongodb.net/burjAlArab?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -57,10 +56,16 @@ client.connect((err) => {
                 res.send(documents);
               });
           }
+          else{
+            res.status(401).send('un authorized access')
+          }
         })
         .catch((error) => {
           // Handle error
         });
+    }
+    else{
+        res.status(401).send('un authorized access')
     }
   });
 });
